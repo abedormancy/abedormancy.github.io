@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>一叶孤帆</title>
+  <subtitle>ooOps</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yygf.ga/"/>
+  <updated>2017-06-11T06:53:25.406Z</updated>
+  <id>http://yygf.ga/</id>
+  
+  <author>
+    <name>abedormancy</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Test5</title>
+    <link href="http://yygf.ga/2017/06/11/Test5/"/>
+    <id>http://yygf.ga/2017/06/11/Test5/</id>
+    <published>2017-06-11T06:52:08.000Z</published>
+    <updated>2017-06-11T06:53:25.406Z</updated>
+    
+    <content type="html"><![CDATA[<p>2017-6-11 14:53:23 。。。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      no description...
+    
+    </summary>
+    
+      <category term="测试" scheme="http://yygf.ga/categories/%E6%B5%8B%E8%AF%95/"/>
+    
+    
+      <category term="标签1" scheme="http://yygf.ga/tags/%E6%A0%87%E7%AD%BE1/"/>
+    
+      <category term="标签2" scheme="http://yygf.ga/tags/%E6%A0%87%E7%AD%BE2/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Test2</title>
+    <link href="http://yygf.ga/2017/06/10/Test2/"/>
+    <id>http://yygf.ga/2017/06/10/Test2/</id>
+    <published>2017-06-10T15:38:48.000Z</published>
+    <updated>2017-06-10T15:39:03.784Z</updated>
+    
+    <content type="html"><![CDATA[<p>CDN!!!</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;CDN!!!&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Test1</title>
+    <link href="http://yygf.ga/2017/06/10/Test1/"/>
+    <id>http://yygf.ga/2017/06/10/Test1/</id>
+    <published>2017-06-10T15:07:28.000Z</published>
+    <updated>2017-06-10T15:38:41.347Z</updated>
+    
+    <content type="html"><![CDATA[<p>2017-6-10 23:07:35 update</p>
+<p>2017-6-10 23:38:39 update</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;2017-6-10 23:07:35 update&lt;/p&gt;
+&lt;p&gt;2017-6-10 23:38:39 update&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Test</title>
+    <link href="http://yygf.ga/2017/06/10/Test/"/>
+    <id>http://yygf.ga/2017/06/10/Test/</id>
+    <published>2017-06-10T15:05:29.000Z</published>
+    <updated>2017-06-10T15:06:08.266Z</updated>
+    
+    <content type="html"><![CDATA[<p>2017-6-10 23:06:02 update</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;2017-6-10 23:06:02 update&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://yygf.ga/2017/06/10/hello-world/"/>
+    <id>http://yygf.ga/2017/06/10/hello-world/</id>
+    <published>2017-06-10T13:54:23.414Z</published>
+    <updated>2017-06-10T13:54:23.414Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
