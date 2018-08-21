@@ -70,6 +70,8 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="effective java,note,0x01.创建和销毁对象," />
+
 
 
 
@@ -86,15 +88,17 @@
 
 
 
-<meta name="description" content="一纸折扇，荡平天下事，一缕秋风，吹尽凡尘心。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="一叶孤帆">
-<meta property="og:url" content="http://yygf.ga/tags/标签1/index.html">
+<meta name="description" content="当你在考虑构造器参数的顺序或可选参数怎么办？emm，构建器可能更适合你~">
+<meta name="keywords" content="effective java,note,0x01.创建和销毁对象">
+<meta property="og:type" content="article">
+<meta property="og:title" content="02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)">
+<meta property="og:url" content="http://yygf.ga/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/index.html">
 <meta property="og:site_name" content="一叶孤帆">
-<meta property="og:description" content="一纸折扇，荡平天下事，一缕秋风，吹尽凡尘心。">
+<meta property="og:description" content="当你在考虑构造器参数的顺序或可选参数怎么办？emm，构建器可能更适合你~">
+<meta property="og:updated_time" content="2018-08-21T16:03:24.025Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一叶孤帆">
-<meta name="twitter:description" content="一纸折扇，荡平天下事，一缕秋风，吹尽凡尘心。">
+<meta name="twitter:title" content="02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)">
+<meta name="twitter:description" content="当你在考虑构造器参数的顺序或可选参数怎么办？emm，构建器可能更适合你~">
 
 
 
@@ -111,9 +115,9 @@
 
 
 
-  <link rel="canonical" href="http://yygf.ga/tags/标签1/"/>
+  <link rel="canonical" href="http://yygf.ga/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/"/>
 
-  <title> 标签: 标签1 | 一叶孤帆 </title>
+  <title> 02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder) | 一叶孤帆 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -144,7 +148,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -255,49 +259,181 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        标签1
-        <small>标签</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
     
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-08-20T10:16:00+08:00" content="2018-08-20">
+              2018-08-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/" class="leancloud_visitors" data-flag-title="02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <p>Builder 模式就不做过多介绍了，在设计那些构造函数或静态工厂有多个参数的类时，构建器模式是一个很好的选择，尤其是当许多<strong>参数是可选</strong>的或<strong>类型相同</strong>时。Builder 比 JaveBeans 更安全。</p>
+<p>缺点是写起来比较麻烦，好在我们有 Lombok 神器帮我们自动生成。</p>
+<p>构建器模式还非常适用类层次结构，下面是一个书中的一个例子：</p>
+<p><code>Pizza.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.*;</div><div class="line"></div><div class="line"><span class="comment">// Note that the underlying "simulated self-type" idiom  allows for arbitrary fluid hierarchies, not just builders</span></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Pizza</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">enum</span> Topping &#123;</div><div class="line">		HAM, MUSHROOM, ONION, PEPPER, SAUSAGE</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">final</span> Set&lt;Topping&gt; toppings;</div><div class="line"></div><div class="line">	<span class="keyword">abstract</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">Builder</span>&lt;<span class="title">T</span>&gt;&gt; </span>&#123;</div><div class="line">		EnumSet&lt;Topping&gt; toppings = EnumSet.noneOf(Topping.class);</div><div class="line"></div><div class="line">		<span class="function"><span class="keyword">public</span> T <span class="title">addTopping</span><span class="params">(Topping topping)</span> </span>&#123;</div><div class="line">			toppings.add(Objects.requireNonNull(topping));</div><div class="line">			<span class="keyword">return</span> self();</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="function"><span class="keyword">abstract</span> Pizza <span class="title">build</span><span class="params">()</span></span>;</div><div class="line"></div><div class="line">		<span class="comment">// Subclasses must override this method to return "this"</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> T <span class="title">self</span><span class="params">()</span></span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	Pizza(Builder&lt;?&gt; builder) &#123;</div><div class="line">		toppings = builder.toppings.clone(); <span class="comment">// See Item 50</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意 Pizza.Builder 是具有<strong>递归类型参数的泛型</strong> <em>(.30)</em>，self() 可以正常的返回子类型对象而不需要显示的强制转换，是一种惯用的解决 java 缺乏自我类型的变通方法。</p>
+<p><code>NyPizza.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">import</span> java.util.Objects;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NyPizza</span> <span class="keyword">extends</span> <span class="title">Pizza</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">enum</span> Size &#123;</div><div class="line">		SMALL, MEDIUM, LARGE</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Size size;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> <span class="keyword">extends</span> <span class="title">Pizza</span>.<span class="title">Builder</span>&lt;<span class="title">Builder</span>&gt; </span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">final</span> Size size;</div><div class="line"></div><div class="line">		<span class="function"><span class="keyword">public</span> <span class="title">Builder</span><span class="params">(Size size)</span> </span>&#123;</div><div class="line">			<span class="keyword">this</span>.size = Objects.requireNonNull(size);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">public</span> NyPizza <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> NyPizza(<span class="keyword">this</span>);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> Builder <span class="title">self</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">NyPizza</span><span class="params">(Builder builder)</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>(builder);</div><div class="line">		size = builder.size;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> <span class="string">"New York Pizza with "</span> + toppings;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>Calzone.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calzone</span> <span class="keyword">extends</span> <span class="title">Pizza</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> sauceInside;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> <span class="keyword">extends</span> <span class="title">Pizza</span>.<span class="title">Builder</span>&lt;<span class="title">Builder</span>&gt; </span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">boolean</span> sauceInside = <span class="keyword">false</span>; <span class="comment">// Default</span></div><div class="line"></div><div class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">sauceInside</span><span class="params">()</span> </span>&#123;</div><div class="line">			sauceInside = <span class="keyword">true</span>;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">public</span> Calzone <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> Calzone(<span class="keyword">this</span>);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> Builder <span class="title">self</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Calzone</span><span class="params">(Builder builder)</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>(builder);</div><div class="line">		sauceInside = builder.sauceInside;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> String.format(<span class="string">"Calzone with %s and sauce on the %s"</span>, toppings, sauceInside ? <span class="string">"inside"</span> : <span class="string">"outside"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>注意以上两个子类 Builder 中的 build() 方法，它们都返回了实际的类，这种技术称为协变返回类型( covariant return typing)，允许客户端不需要转换直接使用这些builders，下面看客户端代码。</p>
+<p><code>PizzaTest</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">import</span> <span class="keyword">static</span> effectivejava.chapter2.item2.hierarchicalbuilder.Pizza.Topping.*;</div><div class="line"><span class="keyword">import</span> <span class="keyword">static</span> effectivejava.chapter2.item2.hierarchicalbuilder.NyPizza.Size.*;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PizzaTest</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		NyPizza pizza = <span class="keyword">new</span> NyPizza.Builder(SMALL)</div><div class="line">				.addTopping(SAUSAGE).addTopping(ONION).build();</div><div class="line">		Calzone calzone = <span class="keyword">new</span> Calzone.Builder()</div><div class="line">				.addTopping(HAM).sauceInside().build();</div><div class="line">		</div><div class="line">		System.out.println(pizza);</div><div class="line">		System.out.println(calzone);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 
-      <h1 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2017/06/11/Test5/" itemprop="url">
-              
-                <span itemprop="name">Test5</span>
-              
-            </a>
+
+      
+    </div>
+
+    <div>
+      
         
-      </h1>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-06-11T14:52:08+08:00"
-              content="2017-06-11" >
-          06-11
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-java/" rel="tag">#effective java</a>
+          
+            <a href="/tags/note/" rel="tag">#note</a>
+          
+            <a href="/tags/0x01-创建和销毁对象/" rel="tag">#0x01.创建和销毁对象</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/18/01-考虑使用静态工厂方法代替构造器/" rel="next" title="01.考虑使用静态工厂方法代替构造器">
+                <i class="fa fa-chevron-left"></i> 01.考虑使用静态工厂方法代替构造器
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/21/03-用私有构造器或枚举类实现单例/" rel="prev" title="03.用私有构造器或枚举类实现单例">
+                03.用私有构造器或枚举类实现单例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </div>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
           
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTA0OS81NjE4">
+      </div>
+  
+  </div>
+
 
         </div>
         
@@ -317,8 +453,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://7xl5g1.com1.z0.glb.clouddn.com/blog/170611/f3Djk0fkeC.png"
@@ -472,6 +617,17 @@
       </section>
 
       
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+        </section>
+      
 
     </div>
   </aside>
@@ -583,6 +739,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

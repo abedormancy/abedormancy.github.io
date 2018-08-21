@@ -70,6 +70,8 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
+  <meta name="keywords" content="effective java,note,0x01.创建和销毁对象," />
+
 
 
 
@@ -86,15 +88,17 @@
 
 
 
-<meta name="description" content="一纸折扇，荡平天下事，一缕秋风，吹尽凡尘心。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="一叶孤帆">
-<meta property="og:url" content="http://yygf.ga/tags/标签1/index.html">
+<meta name="description" content="这可能是 effective java 中最简单的一个0 0.">
+<meta name="keywords" content="effective java,note,0x01.创建和销毁对象">
+<meta property="og:type" content="article">
+<meta property="og:title" content="04.用私有构造器实现不可实例化类">
+<meta property="og:url" content="http://yygf.ga/2018/08/21/04-用私有构造器实现不可实例化类/index.html">
 <meta property="og:site_name" content="一叶孤帆">
-<meta property="og:description" content="一纸折扇，荡平天下事，一缕秋风，吹尽凡尘心。">
+<meta property="og:description" content="这可能是 effective java 中最简单的一个0 0.">
+<meta property="og:updated_time" content="2018-08-21T16:05:37.694Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一叶孤帆">
-<meta name="twitter:description" content="一纸折扇，荡平天下事，一缕秋风，吹尽凡尘心。">
+<meta name="twitter:title" content="04.用私有构造器实现不可实例化类">
+<meta name="twitter:description" content="这可能是 effective java 中最简单的一个0 0.">
 
 
 
@@ -111,9 +115,9 @@
 
 
 
-  <link rel="canonical" href="http://yygf.ga/tags/标签1/"/>
+  <link rel="canonical" href="http://yygf.ga/2018/08/21/04-用私有构造器实现不可实例化类/"/>
 
-  <title> 标签: 标签1 | 一叶孤帆 </title>
+  <title> 04.用私有构造器实现不可实例化类 | 一叶孤帆 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -144,7 +148,7 @@
     
   
 
-  <div class="container one-collumn sidebar-position-left  ">
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -255,49 +259,167 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-collapse">
-    <div class="collection-title">
-      <h2 >
-        标签1
-        <small>标签</small>
-      </h2>
-    </div>
+  <div id="posts" class="posts-expand">
     
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                04.用私有构造器实现不可实例化类
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-08-21T23:37:00+08:00" content="2018-08-21">
+              2018-08-21
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/08/21/04-用私有构造器实现不可实例化类/" class="leancloud_visitors" data-flag-title="04.用私有构造器实现不可实例化类">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
       
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+      
+        <p>在项目中，我们经常会用到一些工具类 (utility class) ，这些工具类实例化对它们没有任何意义。但是我们知道在缺少显示构造器的情况下，编译器会自动提供一个公有无参数的 default constructor，所以我们显示的提供一个私有构造器即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 工具类，不可实例化</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UtilityClass</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">UtilityClass</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> AssertionError();</div><div class="line">	&#125;</div><div class="line">	<span class="comment">// ...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这种习惯用法有一个副作用就是不能被子类化~</p>
 
-      <h1 class="post-title">
+      
+    </div>
+
+    <div>
+      
         
-            <a class="post-title-link" href="/2017/06/11/Test5/" itemprop="url">
-              
-                <span itemprop="name">Test5</span>
-              
-            </a>
+
+      
+    </div>
+
+    <div>
+      
         
-      </h1>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2017-06-11T14:52:08+08:00"
-              content="2017-06-11" >
-          06-11
-        </time>
-      </div>
+      
+    </div>
 
-    </header>
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/effective-java/" rel="tag">#effective java</a>
+          
+            <a href="/tags/note/" rel="tag">#note</a>
+          
+            <a href="/tags/0x01-创建和销毁对象/" rel="tag">#0x01.创建和销毁对象</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/21/03-用私有构造器或枚举类实现单例/" rel="next" title="03.用私有构造器或枚举类实现单例">
+                <i class="fa fa-chevron-left"></i> 03.用私有构造器或枚举类实现单例
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </article>
 
 
-    
-  </div>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
           
+  <div class="comments" id="comments">
+    
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8yOTA0OS81NjE4">
+      </div>
+  
+  </div>
+
 
         </div>
         
@@ -317,8 +439,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel  sidebar-panel-active ">
+      <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://7xl5g1.com1.z0.glb.clouddn.com/blog/170611/f3Djk0fkeC.png"
@@ -472,6 +603,17 @@
       </section>
 
       
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">此文章未包含目录</p>
+            
+          </div>
+        </section>
+      
 
     </div>
   </aside>
@@ -583,6 +725,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
 
   
 

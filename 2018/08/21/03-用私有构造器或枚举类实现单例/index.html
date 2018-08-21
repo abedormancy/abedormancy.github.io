@@ -95,7 +95,7 @@
 <meta property="og:url" content="http://yygf.ga/2018/08/21/03-用私有构造器或枚举类实现单例/index.html">
 <meta property="og:site_name" content="一叶孤帆">
 <meta property="og:description" content="单元素枚举类是实现单例类的最佳方案~">
-<meta property="og:updated_time" content="2018-08-21T15:06:05.338Z">
+<meta property="og:updated_time" content="2018-08-21T16:05:09.345Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="03.用私有构造器或枚举类实现单例">
 <meta name="twitter:description" content="单元素枚举类是实现单例类的最佳方案~">
@@ -351,14 +351,14 @@
         <p><strong>Singleton</strong>(单例) 指的是仅仅只会被实例化一次的类。通常用来表示无状态对象，例如 function <em>(.24)</em> 或本质上唯一的系统组件。这里不打算讲设计模式中单例模式的什么饿汉，懒汉，DCL（双检锁）等等，有兴趣的可以自己上网搜索。</p>
 <p>effective java 中提出了三种方法实现 Singleton 。</p>
 <p>第一种直接使用公有域。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">  	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilder</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">//...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilder</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="comment">//...</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>第二种使用公有静态工厂方法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">  	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> INSTANCE;</div><div class="line">    &#125;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilding</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">//...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> INSTANCE;</div><div class="line">	&#125;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilding</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="comment">//...</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>第二种有个主要优势是可以使用方法引用，例如：<code>Supplier&lt;Singleton&gt; singleton = Singleton::getInstance;</code></p>
 <p>以上两种如果不对私有构造器做处理的话，享有特权的客户端可以借助 AccessibleObject.setAccessible 方法通过反射 <em>(.65)</em> 机制调用私有构造器。如果要防御这种攻击，可以修改私有构造器，在生成第二个对象时抛出异常。这两种如果要实现序列化还比较麻烦，不仅在类声明上需要 “implements Serializable” ，并且必须声明所有的实例域都是瞬时 (transient) 的，还要提供一个 readResolve <em>(.89)</em> 方法。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">readResolve</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> INSTANCE;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">readResolve</span><span class="params">()</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> INSTANCE;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>第三种方式是使用单元素枚举类。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Singleton &#123;</div><div class="line">    INSTANCE;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilding</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">//...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Singleton &#123;</div><div class="line">	INSTANCE;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilding</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="comment">//...</span></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>该方式无偿的提供了序列化机制，并且防止多次实例化，即使面对复杂的序列化或反射攻击的时候。</p>
 <p>Josh Bloch 大大给出的结论是，<strong>单元素枚举类是实现单例的最佳方法</strong>。</p>
 <p>但有一点请注意，如果你的单例类需要继承非枚举的超类，那么你就不可以用这个方法。</p>
@@ -397,13 +397,17 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/08/20/02-面对多个参数的构造器-Constractor-要考虑使用构建器-Builder/" rel="next" title="02.面对多个参数的构造器(Constractor)要考虑使用构建器(Builder)">
-                <i class="fa fa-chevron-left"></i> 02.面对多个参数的构造器(Constractor)要考虑使用构建器(Builder)
+              <a href="/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/" rel="next" title="02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)">
+                <i class="fa fa-chevron-left"></i> 02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/21/04-用私有构造器实现不可实例化类/" rel="prev" title="04.用私有构造器实现不可实例化类">
+                04.用私有构造器实现不可实例化类 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -471,7 +475,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
