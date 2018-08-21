@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[03.用私有构造器或枚举类实现单例]]></title>
+    <url>%2F2018%2F08%2F21%2F03-%E7%94%A8%E7%A7%81%E6%9C%89%E6%9E%84%E9%80%A0%E5%99%A8%E6%88%96%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%AE%9E%E7%8E%B0%E5%8D%95%E4%BE%8B%2F</url>
+    <content type="text"><![CDATA[Singleton(单例) 指的是仅仅只会被实例化一次的类。通常用来表示无状态对象，例如 function (.24) 或本质上唯一的系统组件。这里不打算讲设计模式中单例模式的什么饿汉，懒汉，DCL（双检锁）等等，有兴趣的可以自己上网搜索。 effective java 中提出了三种方法实现 Singleton 。 第一种直接使用公有域。 1234567public class Singleton &#123; public static final Singleton INSTANCE = new Singleton(); private Singleton() &#123;&#125;; public void leaveTheBuilder() &#123; //... &#125;&#125; 第二种使用公有静态工厂方法。 12345678910public class Singleton &#123; private static final Singleton INSTANCE = new Singleton(); private Singleton() &#123;&#125;; public static Singleton getInstance() &#123; return INSTANCE; &#125; public void leaveTheBuilding() &#123; //... &#125;&#125; 第二种有个主要优势是可以使用方法引用，例如：Supplier&lt;Singleton&gt; singleton = Singleton::getInstance; 以上两种如果不对私有构造器做处理的话，享有特权的客户端可以借助 AccessibleObject.setAccessible 方法通过反射 (.65) 机制调用私有构造器。如果要防御这种攻击，可以修改私有构造器，在生成第二个对象时抛出异常。这两种如果要实现序列化还比较麻烦，不仅在类声明上需要 “implements Serializable” ，并且必须声明所有的实例域都是瞬时 (transient) 的，还要提供一个 readResolve (.89) 方法。 123private Object readResolve() &#123; return INSTANCE;&#125; 第三种方式是使用单元素枚举类。 123456public enum Singleton &#123; INSTANCE; public void leaveTheBuilding() &#123; //... &#125;&#125; 该方式无偿的提供了序列化机制，并且防止多次实例化，即使面对复杂的序列化或反射攻击的时候。 Josh Bloch 大大给出的结论是，单元素枚举类是实现单例的最佳方法。 但有一点请注意，如果你的单例类需要继承非枚举的超类，那么你就不可以用这个方法。]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>effective java</tag>
+        <tag>note</tag>
+        <tag>0x01.创建和销毁对象</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[02.面对多个参数的构造器(Constractor)要考虑使用构建器(Builder)]]></title>
     <url>%2F2018%2F08%2F20%2F02-%E9%9D%A2%E5%AF%B9%E5%A4%9A%E4%B8%AA%E5%8F%82%E6%95%B0%E7%9A%84%E6%9E%84%E9%80%A0%E5%99%A8-Constractor-%E8%A6%81%E8%80%83%E8%99%91%E4%BD%BF%E7%94%A8%E6%9E%84%E5%BB%BA%E5%99%A8-Builder%2F</url>
     <content type="text"><![CDATA[Builder 模式就不做过多介绍了，在设计那些构造函数或静态工厂有多个参数的类时，构建器模式是一个很好的选择，尤其是当许多参数是可选的或类型相同时。Builder 比 JaveBeans 更安全。 缺点是写起来比较麻烦，好在我们有 Lombok 神器帮我们自动生成。 构建器模式还非常适用类层次结构，下面是一个书中的一个例子： Pizza.java 1234567891011121314151617181920212223242526272829303132package effectivejava.chapter2.item2.hierarchicalbuilder;import java.util.*;// Note that the underlying "simulated self-type" idiom allows for arbitrary fluid hierarchies, not just builderspublic abstract class Pizza &#123; public enum Topping &#123; HAM, MUSHROOM, ONION, PEPPER, SAUSAGE &#125; final Set&lt;Topping&gt; toppings; abstract static class Builder&lt;T extends Builder&lt;T&gt;&gt; &#123; EnumSet&lt;Topping&gt; toppings = EnumSet.noneOf(Topping.class); public T addTopping(Topping topping) &#123; toppings.add(Objects.requireNonNull(topping)); return self(); &#125; abstract Pizza build(); // Subclasses must override this method to return "this" protected abstract T self(); &#125; Pizza(Builder&lt;?&gt; builder) &#123; toppings = builder.toppings.clone(); // See Item 50 &#125;&#125; 注意 Pizza.Builder 是具有递归类型参数的泛型 (.30)，self() 可以正常的返回子类型对象而不需要显示的强制转换，是一种惯用的解决 java 缺乏自我类型的变通方法。 NyPizza.java 12345678910111213141516171819202122232425262728293031323334353637383940package effectivejava.chapter2.item2.hierarchicalbuilder;import java.util.Objects;public class NyPizza extends Pizza &#123; public enum Size &#123; SMALL, MEDIUM, LARGE &#125; private final Size size; public static class Builder extends Pizza.Builder&lt;Builder&gt; &#123; private final Size size; public Builder(Size size) &#123; this.size = Objects.requireNonNull(size); &#125; @Override public NyPizza build() &#123; return new NyPizza(this); &#125; @Override protected Builder self() &#123; return this; &#125; &#125; private NyPizza(Builder builder) &#123; super(builder); size = builder.size; &#125; @Override public String toString() &#123; return "New York Pizza with " + toppings; &#125;&#125; Calzone.java 1234567891011121314151617181920212223242526272829303132333435package effectivejava.chapter2.item2.hierarchicalbuilder;public class Calzone extends Pizza &#123; private final boolean sauceInside; public static class Builder extends Pizza.Builder&lt;Builder&gt; &#123; private boolean sauceInside = false; // Default public Builder sauceInside() &#123; sauceInside = true; return this; &#125; @Override public Calzone build() &#123; return new Calzone(this); &#125; @Override protected Builder self() &#123; return this; &#125; &#125; private Calzone(Builder builder) &#123; super(builder); sauceInside = builder.sauceInside; &#125; @Override public String toString() &#123; return String.format("Calzone with %s and sauce on the %s", toppings, sauceInside ? "inside" : "outside"); &#125;&#125; 注意以上两个子类 Builder 中的 build() 方法，它们都返回了实际的类，这种技术称为协变返回类型( covariant return typing)，允许客户端不需要转换直接使用这些builders，下面看客户端代码。 PizzaTest 12345678910111213141516package effectivejava.chapter2.item2.hierarchicalbuilder;import static effectivejava.chapter2.item2.hierarchicalbuilder.Pizza.Topping.*;import static effectivejava.chapter2.item2.hierarchicalbuilder.NyPizza.Size.*;public class PizzaTest &#123; public static void main(String[] args) &#123; NyPizza pizza = new NyPizza.Builder(SMALL) .addTopping(SAUSAGE).addTopping(ONION).build(); Calzone calzone = new Calzone.Builder() .addTopping(HAM).sauceInside().build(); System.out.println(pizza); System.out.println(calzone); &#125;&#125;]]></content>
@@ -37,21 +50,6 @@
         <tag>标签1</tag>
         <tag>标签2</tag>
       </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[Test2]]></title>
-    <url>%2F2017%2F06%2F10%2FTest2%2F</url>
-    <content type="text"><![CDATA[CDN!!!]]></content>
-  </entry>
-  <entry>
-    <title><![CDATA[Test1]]></title>
-    <url>%2F2017%2F06%2F10%2FTest1%2F</url>
-    <content type="text"><![CDATA[2017-6-10 23:07:35 update 2017-6-10 23:38:39 update]]></content>
-  </entry>
-  <entry>
-    <title><![CDATA[Test]]></title>
-    <url>%2F2017%2F06%2F10%2FTest%2F</url>
-    <content type="text"><![CDATA[2017-6-10 23:06:02 update]]></content>
   </entry>
   <entry>
     <title><![CDATA[Hello World]]></title>

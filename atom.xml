@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yygf.ga/"/>
-  <updated>2018-08-20T02:26:11.007Z</updated>
+  <updated>2018-08-21T15:06:05.338Z</updated>
   <id>http://yygf.ga/</id>
   
   <author>
@@ -14,6 +14,46 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>03.用私有构造器或枚举类实现单例</title>
+    <link href="http://yygf.ga/2018/08/21/03-%E7%94%A8%E7%A7%81%E6%9C%89%E6%9E%84%E9%80%A0%E5%99%A8%E6%88%96%E6%9E%9A%E4%B8%BE%E7%B1%BB%E5%AE%9E%E7%8E%B0%E5%8D%95%E4%BE%8B/"/>
+    <id>http://yygf.ga/2018/08/21/03-用私有构造器或枚举类实现单例/</id>
+    <published>2018-08-21T15:02:42.000Z</published>
+    <updated>2018-08-21T15:06:05.338Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>Singleton</strong>(单例) 指的是仅仅只会被实例化一次的类。通常用来表示无状态对象，例如 function <em>(.24)</em> 或本质上唯一的系统组件。这里不打算讲设计模式中单例模式的什么饿汉，懒汉，DCL（双检锁）等等，有兴趣的可以自己上网搜索。</p>
+<p>effective java 中提出了三种方法实现 Singleton 。</p>
+<p>第一种直接使用公有域。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">  	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilder</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">//...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>第二种使用公有静态工厂方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Singleton INSTANCE = <span class="keyword">new</span> Singleton();</div><div class="line">  	<span class="function"><span class="keyword">private</span> <span class="title">Singleton</span><span class="params">()</span> </span>&#123;&#125;;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> INSTANCE;</div><div class="line">    &#125;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilding</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">//...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>第二种有个主要优势是可以使用方法引用，例如：<code>Supplier&lt;Singleton&gt; singleton = Singleton::getInstance;</code></p>
+<p>以上两种如果不对私有构造器做处理的话，享有特权的客户端可以借助 AccessibleObject.setAccessible 方法通过反射 <em>(.65)</em> 机制调用私有构造器。如果要防御这种攻击，可以修改私有构造器，在生成第二个对象时抛出异常。这两种如果要实现序列化还比较麻烦，不仅在类声明上需要 “implements Serializable” ，并且必须声明所有的实例域都是瞬时 (transient) 的，还要提供一个 readResolve <em>(.89)</em> 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">readResolve</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">return</span> INSTANCE;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>第三种方式是使用单元素枚举类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Singleton &#123;</div><div class="line">    INSTANCE;</div><div class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">leaveTheBuilding</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="comment">//...</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>该方式无偿的提供了序列化机制，并且防止多次实例化，即使面对复杂的序列化或反射攻击的时候。</p>
+<p>Josh Bloch 大大给出的结论是，<strong>单元素枚举类是实现单例的最佳方法</strong>。</p>
+<p>但有一点请注意，如果你的单例类需要继承非枚举的超类，那么你就不可以用这个方法。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      单元素枚举类是实现单例类的最佳方案~
+    
+    </summary>
+    
+      <category term="java" scheme="http://yygf.ga/categories/java/"/>
+    
+    
+      <category term="effective java" scheme="http://yygf.ga/tags/effective-java/"/>
+    
+      <category term="note" scheme="http://yygf.ga/tags/note/"/>
+    
+      <category term="0x01.创建和销毁对象" scheme="http://yygf.ga/tags/0x01-%E5%88%9B%E5%BB%BA%E5%92%8C%E9%94%80%E6%AF%81%E5%AF%B9%E8%B1%A1/"/>
+    
+  </entry>
   
   <entry>
     <title>02.面对多个参数的构造器(Constractor)要考虑使用构建器(Builder)</title>
@@ -162,68 +202,6 @@
       <category term="标签1" scheme="http://yygf.ga/tags/%E6%A0%87%E7%AD%BE1/"/>
     
       <category term="标签2" scheme="http://yygf.ga/tags/%E6%A0%87%E7%AD%BE2/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Test2</title>
-    <link href="http://yygf.ga/2017/06/10/Test2/"/>
-    <id>http://yygf.ga/2017/06/10/Test2/</id>
-    <published>2017-06-10T15:38:48.000Z</published>
-    <updated>2017-06-10T15:39:03.784Z</updated>
-    
-    <content type="html"><![CDATA[<p>CDN!!!</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;CDN!!!&lt;/p&gt;
-
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Test1</title>
-    <link href="http://yygf.ga/2017/06/10/Test1/"/>
-    <id>http://yygf.ga/2017/06/10/Test1/</id>
-    <published>2017-06-10T15:07:28.000Z</published>
-    <updated>2017-06-10T15:38:41.347Z</updated>
-    
-    <content type="html"><![CDATA[<p>2017-6-10 23:07:35 update</p>
-<p>2017-6-10 23:38:39 update</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;2017-6-10 23:07:35 update&lt;/p&gt;
-&lt;p&gt;2017-6-10 23:38:39 update&lt;/p&gt;
-
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>Test</title>
-    <link href="http://yygf.ga/2017/06/10/Test/"/>
-    <id>http://yygf.ga/2017/06/10/Test/</id>
-    <published>2017-06-10T15:05:29.000Z</published>
-    <updated>2017-06-10T15:06:08.267Z</updated>
-    
-    <content type="html"><![CDATA[<p>2017-6-10 23:06:02 update</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;2017-6-10 23:06:02 update&lt;/p&gt;
-
-    
-    </summary>
-    
     
   </entry>
   
