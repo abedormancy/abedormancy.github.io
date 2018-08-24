@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取]]></title>
+    <url>%2F2018%2F08%2F24%2F05-%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5-DI-%E6%AF%94%E7%A1%AC%E8%BF%9E%E6%8E%A5%E8%B5%84%E6%BA%90-hardwiring-resources-%E6%9B%B4%E5%8F%AF%E5%8F%96%2F</url>
+    <content type="text"><![CDATA[hardwiring resources，我也不太知道该怎么翻译，跟硬编码 (hard code)可能 有些类似，书中代码的意思是把资源写死在类中（丧失灵活性）或者工具类中修改资源（并发不好控制）。但资源应该通过外部获取而不是直接绑定在工具类中，例如下面这个拼写检查器。 12345678910111213// Dependency injection provides flexibility and testabilitypublic class SpellChecker &#123; private final Lexicon dictionary; public SpellChecker(Lexicon dictionary) &#123; this.dictionary = Objects.requireNonNull(dictionary); &#125; public boolean isValid(String word) &#123; ... &#125; public List&lt;String&gt; suggestions(String typo) &#123; ... &#125;&#125; 可以用任意的 Lexicon 类型的字典传递给构造器得到基于不同的拼写检查器。因为字典不可变特性，多个客户端如果需要完全共享同一个字典，而不用多次实例化这个字典。所以这种模式有一个有用的变体是将资源工厂方法传递给构造方法。工厂是一个可以重复调用创建实例类型的对象，java8 引入的 Supplier&lt;T&gt; 函数接口非常适合代表工厂。通常使用有界通配符类型 (bounded wildcard type) 来约束工厂的入参，例如： Mosic create(Supplier&lt;? extends Tile&gt; tileFactory) 尽管依赖注入很灵活很好测试，但上千依赖的大型项目也有可能因此变得混乱。所以一般项目中都会使用依赖注入框架来解决这些问题，如 Dagger、Guice、Spring 等。注意，以上代码示例中这种用手动为依赖注入的 API 非常适合这些框架的使用。 总之，不要使用单例或静态实用程序类来实现依赖于一个或多个底层资源的类，这些底层资源的行为会影响类的行为，也不要让类直接创建这些资源。相反，将资源或创建资源的工厂传递给构造函数(或静态工厂或构造函数)。这种称为依赖注入的实践将大大增强类的灵活性、可重用性和可测试性。]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+      <tags>
+        <tag>effective java</tag>
+        <tag>note</tag>
+        <tag>0x01.创建和销毁对象</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[04.用私有构造器实现不可实例化类]]></title>
     <url>%2F2018%2F08%2F21%2F04-%E7%94%A8%E7%A7%81%E6%9C%89%E6%9E%84%E9%80%A0%E5%99%A8%E5%AE%9E%E7%8E%B0%E4%B8%8D%E5%8F%AF%E5%AE%9E%E4%BE%8B%E5%8C%96%E7%B1%BB%2F</url>
     <content type="text"><![CDATA[在项目中，我们经常会用到一些工具类 (utility class) ，这些工具类实例化对它们没有任何意义。但是我们知道在缺少显示构造器的情况下，编译器会自动提供一个公有无参数的 default constructor，所以我们显示的提供一个私有构造器即可。 1234567// 工具类，不可实例化public class UtilityClass &#123; private UtilityClass() &#123; throw new AssertionError(); &#125; // ...&#125; 这种习惯用法有一个副作用就是不能被子类化~]]></content>

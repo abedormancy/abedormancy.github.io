@@ -88,17 +88,17 @@
 
 
 
-<meta name="description" content="避免第一反应是提供构造器而不考虑使用静态工厂方法">
+<meta name="description" content="这个。。大家应该用的都比较多~">
 <meta name="keywords" content="effective java,note,0x01.创建和销毁对象">
 <meta property="og:type" content="article">
-<meta property="og:title" content="01.考虑使用静态工厂方法代替构造器">
-<meta property="og:url" content="http://yygf.ga/2018/08/18/01-考虑使用静态工厂方法代替构造器/index.html">
+<meta property="og:title" content="05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取">
+<meta property="og:url" content="http://yygf.ga/2018/08/24/05-依赖注入-DI-比硬连接资源-hardwiring-resources-更可取/index.html">
 <meta property="og:site_name" content="一叶孤帆">
-<meta property="og:description" content="避免第一反应是提供构造器而不考虑使用静态工厂方法">
-<meta property="og:updated_time" content="2018-08-20T02:21:39.610Z">
+<meta property="og:description" content="这个。。大家应该用的都比较多~">
+<meta property="og:updated_time" content="2018-08-24T01:52:53.413Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="01.考虑使用静态工厂方法代替构造器">
-<meta name="twitter:description" content="避免第一反应是提供构造器而不考虑使用静态工厂方法">
+<meta name="twitter:title" content="05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取">
+<meta name="twitter:description" content="这个。。大家应该用的都比较多~">
 
 
 
@@ -115,9 +115,9 @@
 
 
 
-  <link rel="canonical" href="http://yygf.ga/2018/08/18/01-考虑使用静态工厂方法代替构造器/"/>
+  <link rel="canonical" href="http://yygf.ga/2018/08/24/05-依赖注入-DI-比硬连接资源-hardwiring-resources-更可取/"/>
 
-  <title> 01.考虑使用静态工厂方法代替构造器 | 一叶孤帆 </title>
+  <title> 05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取 | 一叶孤帆 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -280,7 +280,7 @@
             
             
               
-                01.考虑使用静态工厂方法代替构造器
+                05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取
               
             
           </h1>
@@ -292,8 +292,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-08-18T22:39:34+08:00" content="2018-08-18">
-              2018-08-18
+            <time itemprop="dateCreated" datetime="2018-08-24T09:46:22+08:00" content="2018-08-24">
+              2018-08-24
             </time>
           </span>
 
@@ -326,7 +326,7 @@
 
           
           
-             <span id="/2018/08/18/01-考虑使用静态工厂方法代替构造器/" class="leancloud_visitors" data-flag-title="01.考虑使用静态工厂方法代替构造器">
+             <span id="/2018/08/24/05-依赖注入-DI-比硬连接资源-hardwiring-resources-更可取/" class="leancloud_visitors" data-flag-title="05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -348,66 +348,12 @@
       
 
       
-        <h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
-<li><p><strong>有名称</strong></p>
-<p>在含有相同签名的多个构造函数的情况下，使用不同名称的静态工厂方法会让API更具可读性。例如：BigInteger 中的一个构造函数 <code>BigInteger(int, int, Random)</code> 返回的 BigInteger 可能为素数，但如果使用 <code>BigInteger.probablePrime</code> 静态工厂方法来表示更为清楚。</p>
-</li>
-</ul>
-<ul>
-<li><p><strong>不需要每次调用时都创建一个新的对象</strong></p>
-<p> 允许不可变类 <em>(.17)</em> 使用预先构造的实例，或在构造时将实例缓存起来进行重复利用，从而避免创建不必要的重复对象。</p>
-</li>
-<li><p><strong>可以返回该类型的任意子类型对象</strong></p>
-<p> 可以灵活的选择返回该类的对象，一个比较常见的应用是 API 可以返回对象且不会让此对象的类变成公有的，这样可以隐藏实现类，此技术适用于基于接口的框架 <em>(.20)</em> 。在 java8 之前接口不能有静态方法，按照惯例，Type 接口通过不可实例化的 Types 类导出其静态方法，一个具体的列子是 Collection 接口 与 Collections 类。还有一点，这样可以强制让用户通过接口来引用被返回的对象，这通常是最佳实践 <em>(.64)</em> 。在 java8 中接口已经可以含有静态方法，许多静态成员应该被放置在接口本身中。然而，仍有必要将大部分实现代码放在单独包的私有类中而不是接口的静态方法，这是因为 java8 中要求所有静态成员是公开的。java9 允许私有静态方法，但静态字段和静态成员类仍然需要公开。</p>
-</li>
-<li><p><strong>返回的类可以根据调用参数而进行变化</strong></p>
-<p> 这点其实是上面那点的引申，参考 EnumSet <em>(.36)</em> ，它没有构造器，只有静态工厂方法，通过参数来决定返回适合当前参数最优的子类，返回的实现类可以随着版本的迭代有多种不同选择，未来如果发现哪个实现类不适合了，完全可以干掉，并且不会对客户端造成任何影响。</p>
-</li>
-<li><p><strong>在编写静态工厂方法的时候，被返回的实现类不需要存在</strong></p>
-<p> 这种灵活的静态工厂方法构成了<em>服务提供者框架</em> 的基础，例如 JDBC API。<br> <em>服务提供者框架</em> 中有三个基础组件：</p>
-<p> ​    <strong><em>服务接口 ( service interface )</em></strong> ：代表实现的服务接口。</p>
-<p> ​    <strong><em>提供者注册API ( provider registration API )</em></strong> ：提供者用来注册和实现。</p>
-<p> ​    <strong><em>服务访问API ( service access API )</em></strong> ：客户端用来访问服务实例，允许客户端指定选择实现的标准，如果没有这样的标准，API 会返回默认实现的实例，或允许客户端循环查看所有可用的实现。它是构成服务提供者框架基础的灵活静态工厂。</p>
-<p> 及一个可选组件：</p>
-<p> ​    <strong><em>服务提供者接口 ( service provider interface )</em></strong> ：描述了产生服务接口实例的工厂对象。在没有此接口的情况下，实现就必须通过反射实例化</p>
-</li>
-</ul>
-<p>对于 JDBC 来说 ，Connection 扮演一部分<strong>服务接口</strong>角色，<code>DriverManager.registerDriver</code> 是<strong>提供者注册API</strong>，<code>DriverManager.getConnection</code>  是服务访问 API，Driver 是<strong>服务提供者接口</strong>。<em>服务提供者框架</em> 模式有很多种变体。例如<strong>服务访问API</strong>返回比提供者提供的更为丰富的<strong>服务接口</strong>。这就是桥接模式。依赖注入框架可以被看作是强力服务提供者。java6 平台包含了一个通用的服务提供者框架 java.util.ServiceLoader ，所以你不必，通常也不应该自己写一个。JDBC 没有使用 ServiceLoader 的原因是因为 JDBC 比 ServiceLoader 更早。</p>
-<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
-<li><p><strong>仅提供静态工厂方法的主要限制是没有 public 或 protected 构造器的类无法被子类化</strong></p>
-<p>一个类不能被子类化也许会因祸得福，因为它鼓励程序员使用<strong>复合代替继承</strong> <em>(.18)</em> ,并且对<strong>不可变类型</strong> <em>(.17)</em> 来说这是必须的。</p>
-</li>
-<li><p><strong>程序员不容易找到它</strong></p>
-<p>静态工厂方法和普通的静态方法没有什么区别，很难在 API 脱颖而出，所以程序员不太容易知道这个类是否提供静态工厂方法。可以通过关注类或接口的文档并且遵守命名习惯来弥补。以下是用于静态工厂方法的一些常用名称：</p>
-<ul>
-<li><p><strong>from</strong> - 一种类型转换方法，通过一个参数返回对应类的实例，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Date d = Date.from(instant);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>of</strong> - 一种聚合方法，通过多个参数并返回包含这种参数的类型，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Set&lt;Rank&gt; faceCards = EnumSet.of(JACK, QUEEN, KING);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>valueOf</strong> - 一种比 <strong>from</strong> 和 <strong>of</strong> 更为冗长的方案，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BigInteger prime = BigInteger.valueOf(Integer.MAX_VALUE);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>intance</strong> or <strong>getInstance</strong> - 返回由其参数（如果有）描述的实例，但不能说该实例与参数具有相同的值，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">StackWalker luke = StackWalker.getInstance(options);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>create</strong> or <strong>newInstance</strong> - 同上，除了保证每个调用都会返回一个新的实例，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Object newArray = Array.newInstance(classObject, arrayLen);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>getType</strong> - 类似 <strong>getInstance</strong> ，但一般不是在该类中定义。<strong>Type</strong> 代表该静态工厂方法返回的对象类型，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">FileStore fs = Files.getFileStore(path);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>newType</strong> - 同上，但保证会返回一个新的实例，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">BufferedReader br = Files.newBufferedReader(path);</div></pre></td></tr></table></figure>
-</li>
-<li><p><strong>type</strong> - 一个简单的 getType 和 newType 的替代方案，例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">List&lt;Complain&gt; litany = Collections.list(legacyLitany);</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<p>总之，静态工厂方法更可取，所以要避免第一反应就提供公共构造器而不首先考虑静态工厂方法。</p>
-</li>
-</ul>
+        <p>hardwiring resources，我也不太知道该怎么翻译，跟硬编码 (hard code)可能 有些类似，书中代码的意思是把资源写死在类中（丧失灵活性）或者工具类中修改资源（并发不好控制）。但资源应该通过外部获取而不是直接绑定在工具类中，例如下面这个拼写检查器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Dependency injection provides flexibility and testability</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SpellChecker</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Lexicon dictionary;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SpellChecker</span><span class="params">(Lexicon dictionary)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.dictionary = Objects.requireNonNull(dictionary);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(String word)</span> </span>&#123; ... &#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">suggestions</span><span class="params">(String typo)</span> </span>&#123; ... &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以用任意的 Lexicon 类型的字典传递给构造器得到基于不同的拼写检查器。因为字典不可变特性，多个客户端如果需要完全共享同一个字典，而不用多次实例化这个字典。所以这种模式有一个有用的变体是将资源工厂方法传递给构造方法。工厂是一个可以重复调用创建实例类型的对象，java8 引入的 <code>Supplier&lt;T&gt;</code> 函数接口非常适合代表工厂。通常使用有界通配符类型 (bounded wildcard type) 来约束工厂的入参，例如：</p>
+<p><code>Mosic create(Supplier&lt;? extends Tile&gt; tileFactory)</code></p>
+<p>尽管依赖注入很灵活很好测试，但上千依赖的大型项目也有可能因此变得混乱。所以一般项目中都会使用依赖注入框架来解决这些问题，如 Dagger、Guice、Spring 等。注意，以上代码示例中这种用手动为依赖注入的 API 非常适合这些框架的使用。</p>
+<p>总之，不要使用单例或静态实用程序类来实现依赖于一个或多个底层资源的类，这些底层资源的行为会影响类的行为，也不要让类直接创建这些资源。相反，将资源或创建资源的工厂传递给构造函数(或静态工厂或构造函数)。这种称为依赖注入的实践将大大增强类的灵活性、可重用性和可测试性。</p>
 
       
     </div>
@@ -443,17 +389,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/06/11/Test5/" rel="next" title="Test5">
-                <i class="fa fa-chevron-left"></i> Test5
+              <a href="/2018/08/21/04-用私有构造器实现不可实例化类/" rel="next" title="04.用私有构造器实现不可实例化类">
+                <i class="fa fa-chevron-left"></i> 04.用私有构造器实现不可实例化类
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/" rel="prev" title="02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)">
-                02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -670,7 +612,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">1.</span> <span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-number">2.</span> <span class="nav-text">缺点</span></a></li></ol></div>
+              <p class="post-toc-empty">此文章未包含目录</p>
             
           </div>
         </section>

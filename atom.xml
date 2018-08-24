@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yygf.ga/"/>
-  <updated>2018-08-21T16:05:37.694Z</updated>
+  <updated>2018-08-24T01:52:53.413Z</updated>
   <id>http://yygf.ga/</id>
   
   <author>
@@ -14,6 +14,38 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取</title>
+    <link href="http://yygf.ga/2018/08/24/05-%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5-DI-%E6%AF%94%E7%A1%AC%E8%BF%9E%E6%8E%A5%E8%B5%84%E6%BA%90-hardwiring-resources-%E6%9B%B4%E5%8F%AF%E5%8F%96/"/>
+    <id>http://yygf.ga/2018/08/24/05-依赖注入-DI-比硬连接资源-hardwiring-resources-更可取/</id>
+    <published>2018-08-24T01:46:22.000Z</published>
+    <updated>2018-08-24T01:52:53.413Z</updated>
+    
+    <content type="html"><![CDATA[<p>hardwiring resources，我也不太知道该怎么翻译，跟硬编码 (hard code)可能 有些类似，书中代码的意思是把资源写死在类中（丧失灵活性）或者工具类中修改资源（并发不好控制）。但资源应该通过外部获取而不是直接绑定在工具类中，例如下面这个拼写检查器。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Dependency injection provides flexibility and testability</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SpellChecker</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> Lexicon dictionary;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">SpellChecker</span><span class="params">(Lexicon dictionary)</span> </span>&#123;</div><div class="line">		<span class="keyword">this</span>.dictionary = Objects.requireNonNull(dictionary);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(String word)</span> </span>&#123; ... &#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">suggestions</span><span class="params">(String typo)</span> </span>&#123; ... &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可以用任意的 Lexicon 类型的字典传递给构造器得到基于不同的拼写检查器。因为字典不可变特性，多个客户端如果需要完全共享同一个字典，而不用多次实例化这个字典。所以这种模式有一个有用的变体是将资源工厂方法传递给构造方法。工厂是一个可以重复调用创建实例类型的对象，java8 引入的 <code>Supplier&lt;T&gt;</code> 函数接口非常适合代表工厂。通常使用有界通配符类型 (bounded wildcard type) 来约束工厂的入参，例如：</p>
+<p><code>Mosic create(Supplier&lt;? extends Tile&gt; tileFactory)</code></p>
+<p>尽管依赖注入很灵活很好测试，但上千依赖的大型项目也有可能因此变得混乱。所以一般项目中都会使用依赖注入框架来解决这些问题，如 Dagger、Guice、Spring 等。注意，以上代码示例中这种用手动为依赖注入的 API 非常适合这些框架的使用。</p>
+<p>总之，不要使用单例或静态实用程序类来实现依赖于一个或多个底层资源的类，这些底层资源的行为会影响类的行为，也不要让类直接创建这些资源。相反，将资源或创建资源的工厂传递给构造函数(或静态工厂或构造函数)。这种称为依赖注入的实践将大大增强类的灵活性、可重用性和可测试性。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      这个。。大家应该用的都比较多~
+    
+    </summary>
+    
+      <category term="java" scheme="http://yygf.ga/categories/java/"/>
+    
+    
+      <category term="effective java" scheme="http://yygf.ga/tags/effective-java/"/>
+    
+      <category term="note" scheme="http://yygf.ga/tags/note/"/>
+    
+      <category term="0x01.创建和销毁对象" scheme="http://yygf.ga/tags/0x01-%E5%88%9B%E5%BB%BA%E5%92%8C%E9%94%80%E6%AF%81%E5%AF%B9%E8%B1%A1/"/>
+    
+  </entry>
   
   <entry>
     <title>04.用私有构造器实现不可实例化类</title>
