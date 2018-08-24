@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yygf.ga/"/>
-  <updated>2018-08-24T01:52:53.413Z</updated>
+  <updated>2018-08-24T02:04:36.255Z</updated>
   <id>http://yygf.ga/</id>
   
   <author>
@@ -14,6 +14,69 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>06.避免创建不必要的对象</title>
+    <link href="http://yygf.ga/2018/08/24/06-%E9%81%BF%E5%85%8D%E5%88%9B%E5%BB%BA%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E5%AF%B9%E8%B1%A1/"/>
+    <id>http://yygf.ga/2018/08/24/06-避免创建不必要的对象/</id>
+    <published>2018-08-24T01:58:17.000Z</published>
+    <updated>2018-08-24T02:04:36.255Z</updated>
+    
+    <content type="html"><![CDATA[<p>通常来说，重用一个对象比创建一个对象合适，毕竟重用的对象更快。如果对象是不可变的，那么总是可以重用它的。下面来看个极端的例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String s = <span class="keyword">new</span> String(<span class="string">"hello"</span>); <span class="comment">// 不要这样做</span></div></pre></td></tr></table></figure>
+<p>相信大部分人也不会这么写，如果上面代码被频繁调用，那么它会频繁的创建新的 String 对象，但这其实是没有必要的。我们知道 String 是不可变的，所以我们只需要</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">String s = <span class="string">"hello"</span>;</div></pre></td></tr></table></figure>
+<p>即可。此外，jvm 还会将 “hello” 放入字符串常量池，对于所有运行在同一虚拟机上的代码，只要它们包含相同的字符串字面量，该对象就会被重用。</p>
+<p>一般来说，如果一个类提供工厂方法，那么我们应该去使用工厂方法而不是构造器来获取对象。就拿包装类 <code>Integer</code> 来说，它提供了一个 <code>valueOf</code> 的静态工厂方法来获取类的实例，例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Integer number = Integer.valueOf(<span class="number">15</span>);</div><div class="line"><span class="comment">// Integer number = 15;   // 通常我们使用这种形式，这其实和上面是等价的</span></div><div class="line"></div><div class="line"><span class="comment">// Integer number = new Integer(15); // java9 中已经被弃用了，程序员不应该直接使用它。</span></div></pre></td></tr></table></figure>
+<p>通过查看 <code>Integer.valueOf</code> 的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Integer <span class="title">valueOf</span><span class="params">(<span class="keyword">int</span> i)</span> </span>&#123;</div><div class="line">	<span class="keyword">if</span> (i &gt;= IntegerCache.low &amp;&amp; i &lt;= IntegerCache.high)</div><div class="line">		<span class="keyword">return</span> IntegerCache.cache[i + (-IntegerCache.low)];</div><div class="line">	<span class="keyword">return</span> <span class="keyword">new</span> Integer(i);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>我们可以知道 Integer 其实是有缓存的。如果数值在缓存内是会直接返回缓存中的实例，否则才会通过构造器新建。 ( 默认情况下，Integer会缓存 byte 位的数值，也就是 ~128 - 127)</p>
+<p>一般对象的创建并不像基本类型的包装类这样来的简单，它们创建的代价通常比较昂贵。来看下面一个例子，我们需要一个方法，它通过正则检查一个参数是否是罗马数字。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isRomanNumeral</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> s.matches(<span class="string">"^(?=.)M*(C[MD]|D?C&#123;0,3&#125;)"</span> + <span class="string">"(X[CL]|L?X&#123;0,3&#125;)(I[XV]|V?I&#123;0,3&#125;)$"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>从直觉上来说并没有什么问题对不对，毕竟 String 类中有这样一个检查字符串与当前正则是否匹配的成员方法可以直接拿来用。但其实这个方法并不适合在性能临界的的情况下重复使用，我们来看下 <code>String.matches</code> 的源码就知道。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(String regex)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> Pattern.matches(regex, <span class="keyword">this</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>它这里直接引用了 <code>Pattern.matches</code> 这个静态方法，而 <code>Pattern.matches</code> 的实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">matches</span><span class="params">(String regex, CharSequence input)</span> </span>&#123;</div><div class="line">	Pattern p = Pattern.compile(regex); <span class="comment">// = new Pattern(regex, 0);</span></div><div class="line">	Matcher m = p.matcher(input);</div><div class="line">	<span class="keyword">return</span> m.matches();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 可以看到它其实是每次都创建了新的 Pattern 实例来检测，为 Pattern 创建实例代价其实是昂贵的，因为它需要将正则表达式编译成有限状态机。为了重用，我们一般会这样：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> java.util.regex.Pattern;</div><div class="line"></div><div class="line"><span class="comment">//Reusing expensive object for improved performance</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RomanNumerals</span> </span>&#123;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Pattern ROMAN = Pattern</div><div class="line">			.compile(<span class="string">"^(?=.)M*(C[MD]|D?C&#123;0,3&#125;)"</span> + <span class="string">"(X[CL]|L?X&#123;0,3&#125;)(I[XV]|V?I&#123;0,3&#125;)$"</span>);</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isRomanNumeral</span><span class="params">(String s)</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> ROMAN.matcher(s).matches();</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果经常调用，相比之下改进的版本会有显著的性能提升。</p>
+<p>讲到这里，要提醒一点，项目里经常看到有人如下类似的写法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> SimpleDateFormat sf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss"</span>);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">format</span><span class="params">(Date date)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> sf.format(date);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>看起来好像没什么问题对不对，这不是类似的吗，把这个 SimpleDateFormat 缓存起来复用了，不用每次创建新的实例，提升性能。</p>
+<p>emm… ，性能是提升了。但在多线程环境下不能这样做，我们看下 SImpleDateFormat 源码内部的注释就知道了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">* Date formats are not <span class="keyword">synchronized</span>.</div><div class="line">* It is recommended to create separate format instances <span class="keyword">for</span> each thread.</div><div class="line">* If multiple threads access a format concurrently, it must be <span class="keyword">synchronized</span></div><div class="line">* externally.</div></pre></td></tr></table></figure>
+<p>非同步，建议为每个线程创建单独的 format 实例，如果多个线程访问一个 format 实例，那么必须同步。主要是因为 format 方法使用到了对象的可变的成员域，多线程同时修改让其变得混乱，你完全预料不到在多线程环境下，这个方法会给你返回一个什么神奇字符串。</p>
+<p>那么又有同学会问，那之前的 Pattern 呢，它就没有线程安全问题吗，我们直接看代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Matcher <span class="title">matcher</span><span class="params">(CharSequence input)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!compiled) &#123;</div><div class="line">        <span class="keyword">synchronized</span>(<span class="keyword">this</span>) &#123; <span class="comment">// 双检锁</span></div><div class="line">            <span class="keyword">if</span> (!compiled)</div><div class="line">                compile();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    Matcher m = <span class="keyword">new</span> Matcher(<span class="keyword">this</span>, input);</div><div class="line">    <span class="keyword">return</span> m;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><code>Pattern.matcher</code> 为了性能，通过 synchronized 关键字使用双检锁方式来检查有限状态机是否编译完毕。因为 Pattern 中并没有任何可修改成员域的方法提供给外部客户端，所以 Pattern 是不可变的，加上返回的是新的 Matcher 实例，所以这个方法在多线程环境下是线程安全的。</p>
+<p>聪明的同学可能会注意到，这个 Matcher 才是对标上面的 SimpleDateFormat。Matcher 源码中同样有条类似的注释。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">* Instances of <span class="keyword">this</span> <span class="class"><span class="keyword">class</span> <span class="title">are</span> <span class="title">not</span> <span class="title">safe</span> <span class="title">for</span> <span class="title">use</span> <span class="title">by</span> <span class="title">multiple</span> <span class="title">concurrent</span> <span class="title">threads</span>.</span></div></pre></td></tr></table></figure>
+<p>最后需要注意的一点是避免无意识的自动装箱 (autoboxing) 操作，例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">sum</span><span class="params">()</span> </span>&#123;</div><div class="line">	Long sum = <span class="number">0L</span>;</div><div class="line">	<span class="keyword">for</span> (<span class="keyword">long</span> i = <span class="number">0</span>; i &lt;= Integer.MAX_VALUE; i++)</div><div class="line">		sum += i;</div><div class="line">	<span class="keyword">return</span> sum;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不小心将 l 写成了大写的 L ，本来想声明一个基本类型却声明成了一个包装类型，这导致 <code>sum += i</code> 在疯狂的进行装箱操作。</p>
+<p>试着回想一下这一篇的标题，不记得了倒回去看一下。</p>
+<p>嗯，避免创建<strong>不必要</strong>的对象。希望没有让人误解这篇文章在暗示“创建对象都是很昂贵的操作，应该避免创建对象“。相反创建和回收构造函数很少做显示工作的小对象是很廉价的操作，尤其是在现代 JVM 上。通过创建附加的对象，提升程序的清晰性、简洁性和功能性，这通常是件好事。</p>
+<p>相反，通过维护自己的对象池 (object pool) 来避免创建对象并不是一件很好的做法，除非池中的对象是非常重量级的。真正需要使用对象池的典型对象就是数据库连接池。建立数据库连接的代价是非常昂贵的，而且数据库会限制你只能用一定的数量连接，因此重用这些对象非常有意义。但是一般来说维护自己的对象池必定会把代码弄的很乱，同时增加内存占用，并损害性能。现代 JVM 实现具有高度优化的 GC，其性能很容易超过轻量级对象池的性能。</p>
+<p>与该条目对应的是 (.50) 中的保护性拷贝，当前条目的意思是“当你应该重用一个现有对象时，不要创建新的对象”，而 (.50) 中条目的意思是“当你应该创建一个新的对象时，不要重复使用现有对象”。请注意当保护性拷贝被使用时，重用对象的代价远远大于创建重复对象的代价。必要时如果没能实施保护性拷贝，将会导致潜在的错误和安全漏洞，而创建不必要的对象只会影响程序的风格和性能。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      避免无意识的装箱操作，优先使用类提供的静态工厂方法而不是构造器来创建对象~
+    
+    </summary>
+    
+      <category term="java" scheme="http://yygf.ga/categories/java/"/>
+    
+    
+      <category term="effective java" scheme="http://yygf.ga/tags/effective-java/"/>
+    
+      <category term="note" scheme="http://yygf.ga/tags/note/"/>
+    
+      <category term="0x01.创建和销毁对象" scheme="http://yygf.ga/tags/0x01-%E5%88%9B%E5%BB%BA%E5%92%8C%E9%94%80%E6%AF%81%E5%AF%B9%E8%B1%A1/"/>
+    
+  </entry>
   
   <entry>
     <title>05.依赖注入 (DI) 比硬连接资源 (hardwiring resources) 更可取</title>
