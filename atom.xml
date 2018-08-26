@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yygf.ga/"/>
-  <updated>2018-08-24T02:04:36.255Z</updated>
+  <updated>2018-08-26T02:47:04.005Z</updated>
   <id>http://yygf.ga/</id>
   
   <author>
@@ -14,6 +14,47 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>07.消除过期的对象引用</title>
+    <link href="http://yygf.ga/2018/08/26/07-%E6%B6%88%E9%99%A4%E8%BF%87%E6%9C%9F%E7%9A%84%E5%AF%B9%E8%B1%A1%E5%BC%95%E7%94%A8/"/>
+    <id>http://yygf.ga/2018/08/26/07-消除过期的对象引用/</id>
+    <published>2018-08-26T02:41:56.000Z</published>
+    <updated>2018-08-26T02:47:04.005Z</updated>
+    
+    <content type="html"><![CDATA[<p>先来看这样一个简单的栈实现例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Stack</span> </span>&#123;</div><div class="line">	</div><div class="line">	<span class="keyword">private</span> Object[] elements;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">int</span> size = <span class="number">0</span>;</div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_INITIAL_CAPACITY = <span class="number">16</span>;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="title">Stack</span><span class="params">()</span> </span>&#123;</div><div class="line">		elements = <span class="keyword">new</span> Object[DEFAULT_INITIAL_CAPACITY];</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">push</span><span class="params">(Object e)</span> </span>&#123;</div><div class="line">		ensureCapacity();</div><div class="line">		elements[size++] = e;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> Object <span class="title">pop</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (size == <span class="number">0</span>)</div><div class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> EmptyStackException();</div><div class="line">		<span class="keyword">return</span> elements[--size];</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="comment">/***</span></div><div class="line">	 * Ensure space for at least one more element, roughly* doubling the capacity</div><div class="line">	 * each time the array needs to grow.</div><div class="line">	 */</div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ensureCapacity</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">if</span> (elements.length == size)</div><div class="line">			elements = Arrays.copyOf(elements, <span class="number">2</span> * size + <span class="number">1</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>不严格的来说，这段程序隐藏着”内存泄露“。在极端情况下，会引起磁盘分页 (disk paging)，甚至导致 OOM (OutOfMemoryError)，虽然这种失败的情况相对比较少见。</p>
+<p>栈先通过 <code>ensureCapacity()</code> 方法增长后，再收缩，那么从栈中弹出的这些对象即使被客户端不再引用，它们也不会被当做垃圾回收掉。这是因为栈内部维护着这些对象的过期引用( obsolete reference )，过期引用是指永远也不会再被解除的引用。</p>
+<p>在支持 GC 的语言中，内存泄露是很隐蔽的（称这类内存泄露为“无意识的对象保持”更为恰当）。如果一个对象引用被无意识的保留起来，那么 GC 不仅不会处理这个对象，而且也不会处理被这个对象所引用的对象，从而对性能造成潜在的影响。</p>
+<p>这类问题的解决办法很简单：一旦对象引用过期后，只需要将指向它的引用置空即可。对于上述的例子，弹出栈顶元素后指向它的引用就过期了。 修订后的 pop() 方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">pop</span><span class="params">()</span> </span>&#123;</div><div class="line">	<span class="keyword">if</span> (size == <span class="number">0</span>)</div><div class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> EmptyStackException();</div><div class="line">	Object obj = elements[--size];</div><div class="line">	elements[size] = <span class="keyword">null</span>;</div><div class="line">	<span class="keyword">return</span> obj;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>清除过期引用还有一个好处是，如果它们以后被不小心错误的引用了，会抛出 NPE，而不是悄悄地错误运行下去，尽快检测出程序中的错误中是好的。</p>
+<p>那么我们是否需要将不再用到的对象引用都清空？其实没有必要这样做，<strong>清空对象引用只是一种例外情况，而不是一种规范</strong>。消除过期引用的最好方法是让包含该引用的变量结束其声明周期。例如你在一个紧凑的作用域范围定义的每一个变量，它们会自然而然的被消除。</p>
+<p>那到底什么时候该清空引用？问题在于 Stack 类自己管理内存。存储池包含了 elements 数组（对象的引用，而不是对象本身）的元素。数组的活动区域 ( 0 ~ size ) 的元素是已分配的 ( allocated )，而数组的其余部分则是自由 ( free ) 的。对 GC 来说，整个 elements 数组中的所有对象引用同等有效，只有程序员知道这些非活动部分已经没有用处了。所以程序员应该通过显示的清空数组元素来告诉 GC，GC 才知道这些非活动部分可以被回收。</p>
+<p>所以<strong>当一个类自己管理内存时，程序员应该警惕内存泄露问题</strong>。</p>
+<p><strong>内存泄露的另一种常见来源是缓存</strong>。一旦你把对象引用放到缓存中，它就很容易被遗忘掉。对于这种问题，有几个解决方案。例如 WeakHashMap 中的 entry 的生命周期是由外部对其 key 的引用来决定，记住如果 entry 的期望寿命是由外部引用的 key ，而不是 value 时，才可以用 WeakHashMap。 </p>
+<p>更常见的是缓存有用的生命周期不太好定义，随着时间推移，entry 的价值会变得越来越低。在这种情况下可以通过后台线程（也许是 ScheduledThreadPoolExecutor）来清除已经废弃的 entry。也可以通过向缓存中添加新条目时顺便清理。LinkedHashMap 使用 removeEldestEntry 方法实现了后一种方案。对于更复杂的缓存，可能需要使用<code>java.lang.ref</code>。</p>
+<p><strong>第三个常见的内存泄露来源是监听器和其他回调</strong>，如果你实现了一个 API ，客户端在这个 API 中注册回调，却没注销，除非你采取一些措施，否则回调会积累起来。确保回调被及时被当做垃圾回收的最佳做法是只保存它们的弱引用 ( weak reference )，例如只将它们作为键存储在 WeakHashMap 中。</p>
+<p>关于 java 中的强、软、弱、虚等引用可以参考 <a href="http://www.cnblogs.com/dolphin0520/p/3784171.html" target="_blank" rel="external">Java 如何有效避免OOM</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      不要认为有了 GC 就可高枕无忧，警惕内存泄露问题~
+    
+    </summary>
+    
+      <category term="java" scheme="http://yygf.ga/categories/java/"/>
+    
+    
+      <category term="effective java" scheme="http://yygf.ga/tags/effective-java/"/>
+    
+      <category term="note" scheme="http://yygf.ga/tags/note/"/>
+    
+      <category term="0x01.创建和销毁对象" scheme="http://yygf.ga/tags/0x01-%E5%88%9B%E5%BB%BA%E5%92%8C%E9%94%80%E6%AF%81%E5%AF%B9%E8%B1%A1/"/>
+    
+  </entry>
   
   <entry>
     <title>06.避免创建不必要的对象</title>
