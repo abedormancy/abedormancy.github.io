@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yygf.ga/"/>
-  <updated>2018-09-18T11:25:15.348Z</updated>
+  <updated>2018-09-18T11:38:18.950Z</updated>
   <id>http://yygf.ga/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://yygf.ga/2018/09/18/HTTP-Header-Fields/"/>
     <id>http://yygf.ga/2018/09/18/HTTP-Header-Fields/</id>
     <published>2018-09-18T10:24:14.000Z</published>
-    <updated>2018-09-18T11:25:15.348Z</updated>
+    <updated>2018-09-18T11:38:18.950Z</updated>
     
     <content type="html"><![CDATA[<p>HTTP 首部字段是构成 HTTP 报文的要素之一。在客户端与服务器之间以 HTTP 协议进行通信的过程中，无论是请求还是响应都会使用首部字段，它能起到传递额外重要信息的作用。</p>
 <p>使用首部字段是为了给浏览器和服务器提供报文主体大小、所使用的语言、认证信息等内容。</p>
@@ -56,7 +56,7 @@
     
     <summary type="html">
     
-      整理自“图解HTTP”
+      from “图解HTTP”
     
     </summary>
     
