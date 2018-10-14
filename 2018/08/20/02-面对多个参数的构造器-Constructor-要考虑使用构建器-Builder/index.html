@@ -95,7 +95,7 @@
 <meta property="og:url" content="http://yygf.ga/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/index.html">
 <meta property="og:site_name" content="一叶孤帆">
 <meta property="og:description" content="当你在考虑构造器参数的顺序或可选参数怎么办？emm，构建器可能更适合你~">
-<meta property="og:updated_time" content="2018-08-21T16:03:24.025Z">
+<meta property="og:updated_time" content="2018-09-18T11:41:45.677Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="02.面对多个参数的构造器(Constructor)要考虑使用构建器(Builder)">
 <meta name="twitter:description" content="当你在考虑构造器参数的顺序或可选参数怎么办？emm，构建器可能更适合你~">
@@ -359,7 +359,7 @@
 <p><code>Calzone.java</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calzone</span> <span class="keyword">extends</span> <span class="title">Pizza</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> sauceInside;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> <span class="keyword">extends</span> <span class="title">Pizza</span>.<span class="title">Builder</span>&lt;<span class="title">Builder</span>&gt; </span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">boolean</span> sauceInside = <span class="keyword">false</span>; <span class="comment">// Default</span></div><div class="line"></div><div class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">sauceInside</span><span class="params">()</span> </span>&#123;</div><div class="line">			sauceInside = <span class="keyword">true</span>;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">public</span> Calzone <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> Calzone(<span class="keyword">this</span>);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> Builder <span class="title">self</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Calzone</span><span class="params">(Builder builder)</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>(builder);</div><div class="line">		sauceInside = builder.sauceInside;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> String.format(<span class="string">"Calzone with %s and sauce on the %s"</span>, toppings, sauceInside ? <span class="string">"inside"</span> : <span class="string">"outside"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>注意以上两个子类 Builder 中的 build() 方法，它们都返回了实际的类，这种技术称为协变返回类型( covariant return typing)，允许客户端不需要转换直接使用这些builders，下面看客户端代码。</p>
-<p><code>PizzaTest</code></p>
+<p><code>PizzaTest.java</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">import</span> <span class="keyword">static</span> effectivejava.chapter2.item2.hierarchicalbuilder.Pizza.Topping.*;</div><div class="line"><span class="keyword">import</span> <span class="keyword">static</span> effectivejava.chapter2.item2.hierarchicalbuilder.NyPizza.Size.*;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PizzaTest</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		NyPizza pizza = <span class="keyword">new</span> NyPizza.Builder(SMALL)</div><div class="line">				.addTopping(SAUSAGE).addTopping(ONION).build();</div><div class="line">		Calzone calzone = <span class="keyword">new</span> Calzone.Builder()</div><div class="line">				.addTopping(HAM).sauceInside().build();</div><div class="line">		</div><div class="line">		System.out.println(pizza);</div><div class="line">		System.out.println(calzone);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 
       
@@ -474,7 +474,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-count">11</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -482,7 +482,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -491,7 +491,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">7</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

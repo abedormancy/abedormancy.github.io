@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yygf.ga/"/>
-  <updated>2018-09-18T11:38:18.950Z</updated>
+  <updated>2018-10-14T04:59:29.981Z</updated>
   <id>http://yygf.ga/</id>
   
   <author>
@@ -14,6 +14,44 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>一种楼层公平抽奖思路</title>
+    <link href="http://yygf.ga/2018/10/13/%E4%B8%80%E7%A7%8D%E6%A5%BC%E5%B1%82%E5%85%AC%E5%B9%B3%E6%8A%BD%E5%A5%96%E6%80%9D%E8%B7%AF/"/>
+    <id>http://yygf.ga/2018/10/13/一种楼层公平抽奖思路/</id>
+    <published>2018-10-13T15:20:03.000Z</published>
+    <updated>2018-10-14T04:59:29.981Z</updated>
+    
+    <content type="html"><![CDATA[<p>以前，经常看到贴吧呀、论坛呀一些抽奖活动。这些活动中楼主会给出奖品数量、参与抽奖截止时间等。有的还会要求不允许用户重复参与回复，甚至看过楼主用爬虫脚本收集楼层数据去除重复等等。抽奖方式也是五花八门，比如先上传一个加密的压缩包，里面有一些比例值。到截止时间后通过楼层数 * 比例值 计算出各中奖楼层，并同时给出密码供事先下载好压缩包的用户验证。</p>
+<p>以前我从来没有仔细去考虑过这类问题，觉得也还算公平。但其实仔细考虑，这样的开奖方式有下面两个主要问题:</p>
+<ol>
+<li><strong>麻烦</strong>，还要要给出比例值或其它能计算出中奖楼层的值，还要上传加密的压缩包，开奖时还要计算，并隐含用户验证成本</li>
+<li><strong>不公平</strong>，为什么说不公平，原因在于抽奖发起方已经事先知道加密包中的内容，所以在参与结束前他可以通过其它账号参与回复来改变楼层数，这样直接导致的结果就是中奖楼层变更</li>
+</ol>
+<p>随便给一个网上对楼层抽奖公平性诉求帖子给大家看下 <a href="http://club.sanguosha.com/thread-51575-1-1.html" target="_blank" rel="external">http://club.sanguosha.com/thread-51575-1-1.html</a></p>
+<p>现在我们知道了这种开奖及其他类似方式是有问题的。那么怎么才能做到公平？答案就是一个简单公式 “<strong>(随机数 % 总楼层数) + 1</strong>”，其结果就是中奖的楼层。随机数区间必须远大于总楼层数或随机数恰好分布在那个啥 ~ 表达不出来，伪代看一下好了 <code>[1, n] || [(x-1)n, xn]</code> ，其中 n 是总楼层数，x 为大于 1 的自然数。</p>
+<p>好了思路开始了，为了保证公平，这个随机数要恰好分布在这区间 <code>[1, n] || [(x-1)n, xn]</code> ，但这太麻烦，也没有思路。至于随机区间必须远大总楼层数倒是可以通过类似给密码加 salt 的方式再进行 hash 得到一个无法预测的值然后通过固定算法转换成一个大的整数。综上，对这个随机数，我们有以下的要求:</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span>) 在抽奖参与截止时间前该随机数必须无法被任何人事先知晓</div><div class="line"><span class="number">2</span>) 随机区间必须大到无法让人无法猜测，换一种说法就是让人无法通过暴力枚举随机数来预估出可能中奖的楼层</div><div class="line"><span class="number">3</span>) 随机数在被公布后必须被所有抽奖参与人认同</div></pre></td></tr></table></figure>
+<p>经过思考，想到生活中第三方随机变量符合要求的有:</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span>) 彩票开奖的号码，奖池金额等等</div><div class="line"><span class="number">2</span>) 股票中的开盘价、收盘价等等各种价成交金额什么的</div></pre></td></tr></table></figure>
+<p>当然，还有其他的我没有想到。如果觉得不够随机，我们可以 attach 多个第三方变量合成一个。不过对于楼层开奖来说，以上已经可以符合我们的要求了。楼层抽奖总流程如下:</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span>) 发布抽奖公告，描述参与截止时间，开奖时间<span class="comment">(等同第三方变量发布时间)</span> 和其他参与规则等</div><div class="line"><span class="number">2</span>) 给出可信的第三方变量获取方式 例如: 大乐透<span class="number">18121</span>期的奖池奖金 http:<span class="comment">//www.lottery.gov.cn/historykj/history.jspx?_ltype=dlt</span></div><div class="line"><span class="number">3</span>) 给出抽奖程序源代码 <span class="comment">(最好是 js，方便用户验证)</span></div></pre></td></tr></table></figure>
+<p>已上就是需要发布的内容。当到达开奖时间时，去拿到第三方变量放到程序中执行一下算出最终获奖的楼层。最后附加开奖信息通知中奖人领奖即可。</p>
+<p>示例 (js，其中 sha 及转大数算法找相关库或自己实现): </p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">award</span>(<span class="params">floor_luck_count, floor_count, value</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> floors = [];</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; floor_luck_count; i++) &#123;</div><div class="line">    <span class="keyword">var</span> hash = sha256(<span class="string">""</span> + value + i);</div><div class="line">    <span class="keyword">var</span> big_int = hash_to_int(hash);</div><div class="line">    <span class="keyword">var</span> luck_floor = (big_int % floor_count) + <span class="number">1</span></div><div class="line">    floors[i] = luck_floor;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> floors;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>此处示例并不保证获奖楼层唯一，我们可以根据抽奖规则进行顺延或其他方式来解决，当然代码层面也可以解决，但这并不是重点~</p>
+]]></content>
+    
+    <summary type="html">
+    
+      忽然想到的，(/≧▽≦)/
+    
+    </summary>
+    
+    
+      <category term="创意" scheme="http://yygf.ga/tags/%E5%88%9B%E6%84%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>HTTP Header Fields</title>
@@ -277,7 +315,7 @@
     <link href="http://yygf.ga/2018/08/20/02-%E9%9D%A2%E5%AF%B9%E5%A4%9A%E4%B8%AA%E5%8F%82%E6%95%B0%E7%9A%84%E6%9E%84%E9%80%A0%E5%99%A8-Constructor-%E8%A6%81%E8%80%83%E8%99%91%E4%BD%BF%E7%94%A8%E6%9E%84%E5%BB%BA%E5%99%A8-Builder/"/>
     <id>http://yygf.ga/2018/08/20/02-面对多个参数的构造器-Constructor-要考虑使用构建器-Builder/</id>
     <published>2018-08-20T02:16:00.000Z</published>
-    <updated>2018-08-21T16:03:24.025Z</updated>
+    <updated>2018-09-18T11:41:45.677Z</updated>
     
     <content type="html"><![CDATA[<p>Builder 模式就不做过多介绍了，在设计那些构造函数或静态工厂有多个参数的类时，构建器模式是一个很好的选择，尤其是当许多<strong>参数是可选</strong>的或<strong>类型相同</strong>时。Builder 比 JaveBeans 更安全。</p>
 <p>缺点是写起来比较麻烦，好在我们有 Lombok 神器帮我们自动生成。</p>
@@ -290,7 +328,7 @@
 <p><code>Calzone.java</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Calzone</span> <span class="keyword">extends</span> <span class="title">Pizza</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">boolean</span> sauceInside;</div><div class="line"></div><div class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> <span class="keyword">extends</span> <span class="title">Pizza</span>.<span class="title">Builder</span>&lt;<span class="title">Builder</span>&gt; </span>&#123;</div><div class="line">		<span class="keyword">private</span> <span class="keyword">boolean</span> sauceInside = <span class="keyword">false</span>; <span class="comment">// Default</span></div><div class="line"></div><div class="line">		<span class="function"><span class="keyword">public</span> Builder <span class="title">sauceInside</span><span class="params">()</span> </span>&#123;</div><div class="line">			sauceInside = <span class="keyword">true</span>;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">public</span> Calzone <span class="title">build</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> Calzone(<span class="keyword">this</span>);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="meta">@Override</span></div><div class="line">		<span class="function"><span class="keyword">protected</span> Builder <span class="title">self</span><span class="params">()</span> </span>&#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">private</span> <span class="title">Calzone</span><span class="params">(Builder builder)</span> </span>&#123;</div><div class="line">		<span class="keyword">super</span>(builder);</div><div class="line">		sauceInside = builder.sauceInside;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> String.format(<span class="string">"Calzone with %s and sauce on the %s"</span>, toppings, sauceInside ? <span class="string">"inside"</span> : <span class="string">"outside"</span>);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>注意以上两个子类 Builder 中的 build() 方法，它们都返回了实际的类，这种技术称为协变返回类型( covariant return typing)，允许客户端不需要转换直接使用这些builders，下面看客户端代码。</p>
-<p><code>PizzaTest</code></p>
+<p><code>PizzaTest.java</code></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> effectivejava.chapter2.item2.hierarchicalbuilder;</div><div class="line"></div><div class="line"><span class="keyword">import</span> <span class="keyword">static</span> effectivejava.chapter2.item2.hierarchicalbuilder.Pizza.Topping.*;</div><div class="line"><span class="keyword">import</span> <span class="keyword">static</span> effectivejava.chapter2.item2.hierarchicalbuilder.NyPizza.Size.*;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PizzaTest</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		NyPizza pizza = <span class="keyword">new</span> NyPizza.Builder(SMALL)</div><div class="line">				.addTopping(SAUSAGE).addTopping(ONION).build();</div><div class="line">		Calzone calzone = <span class="keyword">new</span> Calzone.Builder()</div><div class="line">				.addTopping(HAM).sauceInside().build();</div><div class="line">		</div><div class="line">		System.out.println(pizza);</div><div class="line">		System.out.println(calzone);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 ]]></content>
     
